@@ -1,0 +1,450 @@
+{
+  "info": {
+    "name": "Lab 05 - Student Course Registration API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "TC-01: Идэвхтэй оюутан урьдач нөхцөл хангасан үед амжилттай бүртгүүлэх",
+      "item": [
+        {
+          "name": "Setup - Идэвхтэй оюутан S1001 үүсгэх",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"active\",\"coursesTaken\":[\"CS102\",\"MA101\"]}" },
+            "url": "{{baseUrl}}/students/S1001"
+          }
+        },
+        {
+          "name": "Setup - Урьдач нөхцөлтэй SE305 хичээл үүсгэх",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"prerequisites\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/courses/SE305"
+          }
+        },
+        {
+          "name": "Test - POST /registrations амжилттай бүртгэл (201 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP статус 201 буцаах ёстой', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Хариу result нь OK ба registrationID тоо байх ёстой', function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data.result).to.eql('OK');",
+                  "    pm.expect(data.registrationID).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S1001\",\"courseID\":\"SE305\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-02: Системд бүртгэлгүй оюутан бүртгүүлэхэд ERROR_NO_STUDENT",
+      "item": [
+        {
+          "name": "Setup - SE305 хичээл баталгаажуулах",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"prerequisites\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/courses/SE305"
+          }
+        },
+        {
+          "name": "Test - Бүртгэлгүй оюутан S9999 илгээх",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP статус 200 буцаах ёстой', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Хариу result нь ERROR_NO_STUDENT байх ёстой', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('ERROR_NO_STUDENT');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S9999\",\"courseID\":\"SE305\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-03: Идэвхгүй оюутан бүртгүүлэхэд ERROR_INACTIVE_STUDENT",
+      "item": [
+        {
+          "name": "Setup - Идэвхгүй оюутан S1002 үүсгэх",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"inactive\",\"coursesTaken\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/students/S1002"
+          }
+        },
+        {
+          "name": "Setup - SE305 хичээл баталгаажуулах",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"prerequisites\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/courses/SE305"
+          }
+        },
+        {
+          "name": "Test - Идэвхгүй оюутан бүртгүүлэх",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP статус 200 буцаах ёстой', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Хариу result нь ERROR_INACTIVE_STUDENT байх ёстой', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('ERROR_INACTIVE_STUDENT');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S1002\",\"courseID\":\"SE305\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-04: Системд байхгүй хичээлд бүртгүүлэхэд ERROR_NO_COURSE",
+      "item": [
+        {
+          "name": "Setup - Идэвхтэй оюутан S1001 баталгаажуулах",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"active\",\"coursesTaken\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/students/S1001"
+          }
+        },
+        {
+          "name": "Test - Байхгүй хичээл XX999 руу бүртгүүлэх",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP статус 200 буцаах ёстой', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Хариу result нь ERROR_NO_COURSE байх ёстой', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('ERROR_NO_COURSE');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S1001\",\"courseID\":\"XX999\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-05: Урьдач нөхцөл дутуу үед ERROR_PREREQUISITES ба missing массив буцах",
+      "item": [
+        {
+          "name": "Setup - Зөвхөн CS102 үзсэн оюутан S1003 үүсгэх",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"active\",\"coursesTaken\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/students/S1003"
+          }
+        },
+        {
+          "name": "Setup - CS102 ба CS210 урьдач шаардах SE410 хичээл үүсгэх",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"prerequisites\":[\"CS102\",\"CS210\"]}" },
+            "url": "{{baseUrl}}/courses/SE410"
+          }
+        },
+        {
+          "name": "Test - Дутуу урьдач нөхцөлтэй бүртгэл",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP статус 200 буцаах ёстой', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('ERROR_PREREQUISITES ба дутуу хичээл CS210 буцах ёстой', function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data.result).to.eql('ERROR_PREREQUISITES');",
+                  "    pm.expect(data.missing).to.eql(['CS210']);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S1003\",\"courseID\":\"SE410\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-06: Давхар алдаа 1 - Идэвхгүй оюутан + байхгүй хичээл",
+      "item": [
+        {
+          "name": "Setup - Идэвхгүй оюутан S1002 баталгаажуулах",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"inactive\",\"coursesTaken\":[]}" },
+            "url": "{{baseUrl}}/students/S1002"
+          }
+        },
+        {
+          "name": "Test - Идэвхгүй оюутан ба байхгүй хичээлийн давхар алдаа",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP статус 200 буцаах ёстой', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Оюутны төлөв түрүүлж шалгагдаж ERROR_INACTIVE_STUDENT буцах ёстой', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('ERROR_INACTIVE_STUDENT');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S1002\",\"courseID\":\"NO_COURSE\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-07: Давхар алдаа 2 - Байхгүй оюутан + байхгүй хичээл",
+      "item": [
+        {
+          "name": "Test - Байхгүй оюутан ба байхгүй хичээлийн давхар алдаа",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP статус 200 буцаах ёстой', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Оюутан түрүүлж шалгагдаж ERROR_NO_STUDENT буцах ёстой', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('ERROR_NO_STUDENT');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"NO_STUDENT\",\"courseID\":\"NO_COURSE\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-08: Хязгаар (Boundary) - Урьдач нөхцөлгүй хичээлд хоосон түүхтэй оюутан бүртгүүлэх",
+      "item": [
+        {
+          "name": "Setup - Шинэ оюутан S1004 (coursesTaken: []) үүсгэх",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"active\",\"coursesTaken\":[]}" },
+            "url": "{{baseUrl}}/students/S1004"
+          }
+        },
+        {
+          "name": "Setup - Урьдач нөхцөлгүй CS101 хичээл үүсгэх",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"prerequisites\":[]}" },
+            "url": "{{baseUrl}}/courses/CS101"
+          }
+        },
+        {
+          "name": "Test - Хоосон жагсаалттай үед амжилттай бүртгүүлэх (201 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP статус 201 буцаах ёстой', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Хариу result нь OK байх ёстой', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('OK');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S1004\",\"courseID\":\"CS101\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-09: Хязгаар - Шаардлагатай талбар дутуу үед 400 ERROR_BAD_REQUEST",
+      "item": [
+        {
+          "name": "Test - courseID талбар дутуу хүсэлт илгээх",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP статус 400 буцаах ёстой', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Хариу result нь ERROR_BAD_REQUEST байх ёстой', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('ERROR_BAD_REQUEST');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S1001\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-10: Хязгаар - Буруу JSON формат илгээхэд 400 ERROR_BAD_JSON",
+      "item": [
+        {
+          "name": "Test - Эвдэрсэн JSON синтакс илгээх",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP статус 400 буцаах ёстой', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Хариу result нь ERROR_BAD_JSON байх ёстой', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('ERROR_BAD_JSON');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\": \"S1001\", broken_json" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-11: Даалгавар 5 - Нийтийн API (JSONPlaceholder Users)",
+      "item": [
+        {
+          "name": "Test - GET /users (статус 200, массив, эхний хэрэглэгч)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP статус 200 буцаах ёстой', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Хариу нь хоосон биш массив байх ёстой', function () {",
+                  "    const users = pm.response.json();",
+                  "    pm.expect(users).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "pm.test('Эхний хэрэглэгчийн нэр Leanne Graham байх ёстой', function () {",
+                  "    const users = pm.response.json();",
+                  "    pm.expect(users[0].name).to.eql('Leanne Graham');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "https://jsonplaceholder.typicode.com/users"
+          }
+        }
+      ]
+    }
+  ]
+}
