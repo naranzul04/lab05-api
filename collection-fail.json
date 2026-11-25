@@ -1,0 +1,451 @@
+﻿{
+  "info": {
+    "name": "Lab 05 - Student Course Registration API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "TC-01: Ð˜Ð´ÑÐ²Ñ…Ñ‚ÑÐ¹ Ð¾ÑŽÑƒÑ‚Ð°Ð½ ÑƒÑ€ÑŒÐ´Ð°Ñ‡ Ð½Ó©Ñ…Ñ†Ó©Ð» Ñ…Ð°Ð½Ð³Ð°ÑÐ°Ð½ Ò¯ÐµÐ´ Ð°Ð¼Ð¶Ð¸Ð»Ñ‚Ñ‚Ð°Ð¹ Ð±Ò¯Ñ€Ñ‚Ð³Ò¯Ò¯Ð»ÑÑ…",
+      "item": [
+        {
+          "name": "Setup - Ð˜Ð´ÑÐ²Ñ…Ñ‚ÑÐ¹ Ð¾ÑŽÑƒÑ‚Ð°Ð½ S1001 Ò¯Ò¯ÑÐ³ÑÑ…",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"active\",\"coursesTaken\":[\"CS102\",\"MA101\"]}" },
+            "url": "{{baseUrl}}/students/S1001"
+          }
+        },
+        {
+          "name": "Setup - Ð£Ñ€ÑŒÐ´Ð°Ñ‡ Ð½Ó©Ñ…Ñ†Ó©Ð»Ñ‚ÑÐ¹ SE305 Ñ…Ð¸Ñ‡ÑÑÐ» Ò¯Ò¯ÑÐ³ÑÑ…",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"prerequisites\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/courses/SE305"
+          }
+        },
+        {
+          "name": "Test - POST /registrations Ð°Ð¼Ð¶Ð¸Ð»Ñ‚Ñ‚Ð°Ð¹ Ð±Ò¯Ñ€Ñ‚Ð³ÑÐ» (201 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP ÑÑ‚Ð°Ñ‚ÑƒÑ 201 Ð±ÑƒÑ†Ð°Ð°Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Ð¥Ð°Ñ€Ð¸Ñƒ result Ð½ÑŒ OK Ð±Ð° registrationID Ñ‚Ð¾Ð¾ Ð±Ð°Ð¹Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data.result).to.eql('OK');",
+                  "    pm.expect(data.registrationID).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S1001\",\"courseID\":\"SE305\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-02: Ð¡Ð¸ÑÑ‚ÐµÐ¼Ð´ Ð±Ò¯Ñ€Ñ‚Ð³ÑÐ»Ð³Ò¯Ð¹ Ð¾ÑŽÑƒÑ‚Ð°Ð½ Ð±Ò¯Ñ€Ñ‚Ð³Ò¯Ò¯Ð»ÑÑ…ÑÐ´ ERROR_NO_STUDENT",
+      "item": [
+        {
+          "name": "Setup - SE305 Ñ…Ð¸Ñ‡ÑÑÐ» Ð±Ð°Ñ‚Ð°Ð»Ð³Ð°Ð°Ð¶ÑƒÑƒÐ»Ð°Ñ…",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"prerequisites\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/courses/SE305"
+          }
+        },
+        {
+          "name": "Test - Ð‘Ò¯Ñ€Ñ‚Ð³ÑÐ»Ð³Ò¯Ð¹ Ð¾ÑŽÑƒÑ‚Ð°Ð½ S9999 Ð¸Ð»Ð³ÑÑÑ…",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP ÑÑ‚Ð°Ñ‚ÑƒÑ 200 Ð±ÑƒÑ†Ð°Ð°Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Ð¥Ð°Ñ€Ð¸Ñƒ result Ð½ÑŒ ERROR_NO_STUDENT Ð±Ð°Ð¹Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('ERROR_NO_STUDENT');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S9999\",\"courseID\":\"SE305\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-03: Ð˜Ð´ÑÐ²Ñ…Ð³Ò¯Ð¹ Ð¾ÑŽÑƒÑ‚Ð°Ð½ Ð±Ò¯Ñ€Ñ‚Ð³Ò¯Ò¯Ð»ÑÑ…ÑÐ´ ERROR_INACTIVE_STUDENT",
+      "item": [
+        {
+          "name": "Setup - Ð˜Ð´ÑÐ²Ñ…Ð³Ò¯Ð¹ Ð¾ÑŽÑƒÑ‚Ð°Ð½ S1002 Ò¯Ò¯ÑÐ³ÑÑ…",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"inactive\",\"coursesTaken\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/students/S1002"
+          }
+        },
+        {
+          "name": "Setup - SE305 Ñ…Ð¸Ñ‡ÑÑÐ» Ð±Ð°Ñ‚Ð°Ð»Ð³Ð°Ð°Ð¶ÑƒÑƒÐ»Ð°Ñ…",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"prerequisites\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/courses/SE305"
+          }
+        },
+        {
+          "name": "Test - Ð˜Ð´ÑÐ²Ñ…Ð³Ò¯Ð¹ Ð¾ÑŽÑƒÑ‚Ð°Ð½ Ð±Ò¯Ñ€Ñ‚Ð³Ò¯Ò¯Ð»ÑÑ…",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP ÑÑ‚Ð°Ñ‚ÑƒÑ 200 Ð±ÑƒÑ†Ð°Ð°Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Ð¥Ð°Ñ€Ð¸Ñƒ result Ð½ÑŒ ERROR_INACTIVE_STUDENT Ð±Ð°Ð¹Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('ERROR_INACTIVE_STUDENT');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S1002\",\"courseID\":\"SE305\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-04: Ð¡Ð¸ÑÑ‚ÐµÐ¼Ð´ Ð±Ð°Ð¹Ñ…Ð³Ò¯Ð¹ Ñ…Ð¸Ñ‡ÑÑÐ»Ð´ Ð±Ò¯Ñ€Ñ‚Ð³Ò¯Ò¯Ð»ÑÑ…ÑÐ´ ERROR_NO_COURSE",
+      "item": [
+        {
+          "name": "Setup - Ð˜Ð´ÑÐ²Ñ…Ñ‚ÑÐ¹ Ð¾ÑŽÑƒÑ‚Ð°Ð½ S1001 Ð±Ð°Ñ‚Ð°Ð»Ð³Ð°Ð°Ð¶ÑƒÑƒÐ»Ð°Ñ…",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"active\",\"coursesTaken\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/students/S1001"
+          }
+        },
+        {
+          "name": "Test - Ð‘Ð°Ð¹Ñ…Ð³Ò¯Ð¹ Ñ…Ð¸Ñ‡ÑÑÐ» XX999 Ñ€ÑƒÑƒ Ð±Ò¯Ñ€Ñ‚Ð³Ò¯Ò¯Ð»ÑÑ…",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP ÑÑ‚Ð°Ñ‚ÑƒÑ 200 Ð±ÑƒÑ†Ð°Ð°Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Ð¥Ð°Ñ€Ð¸Ñƒ result Ð½ÑŒ ERROR_NO_COURSE Ð±Ð°Ð¹Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('ERROR_NO_COURSE');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S1001\",\"courseID\":\"XX999\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-05: Ð£Ñ€ÑŒÐ´Ð°Ñ‡ Ð½Ó©Ñ…Ñ†Ó©Ð» Ð´ÑƒÑ‚ÑƒÑƒ Ò¯ÐµÐ´ ERROR_PREREQUISITES Ð±Ð° missing Ð¼Ð°ÑÑÐ¸Ð² Ð±ÑƒÑ†Ð°Ñ…",
+      "item": [
+        {
+          "name": "Setup - Ð—Ó©Ð²Ñ…Ó©Ð½ CS102 Ò¯Ð·ÑÑÐ½ Ð¾ÑŽÑƒÑ‚Ð°Ð½ S1003 Ò¯Ò¯ÑÐ³ÑÑ…",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"active\",\"coursesTaken\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/students/S1003"
+          }
+        },
+        {
+          "name": "Setup - CS102 Ð±Ð° CS210 ÑƒÑ€ÑŒÐ´Ð°Ñ‡ ÑˆÐ°Ð°Ñ€Ð´Ð°Ñ… SE410 Ñ…Ð¸Ñ‡ÑÑÐ» Ò¯Ò¯ÑÐ³ÑÑ…",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"prerequisites\":[\"CS102\",\"CS210\"]}" },
+            "url": "{{baseUrl}}/courses/SE410"
+          }
+        },
+        {
+          "name": "Test - Ð”ÑƒÑ‚ÑƒÑƒ ÑƒÑ€ÑŒÐ´Ð°Ñ‡ Ð½Ó©Ñ…Ñ†Ó©Ð»Ñ‚ÑÐ¹ Ð±Ò¯Ñ€Ñ‚Ð³ÑÐ»",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP ÑÑ‚Ð°Ñ‚ÑƒÑ 200 Ð±ÑƒÑ†Ð°Ð°Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('ERROR_PREREQUISITES Ð±Ð° Ð´ÑƒÑ‚ÑƒÑƒ Ñ…Ð¸Ñ‡ÑÑÐ» CS210 Ð±ÑƒÑ†Ð°Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data.result).to.eql('ERROR_PREREQUISITES');",
+                  "    pm.expect(data.missing).to.eql(['CS210']);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S1003\",\"courseID\":\"SE410\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-06: Ð”Ð°Ð²Ñ…Ð°Ñ€ Ð°Ð»Ð´Ð°Ð° 1 - Ð˜Ð´ÑÐ²Ñ…Ð³Ò¯Ð¹ Ð¾ÑŽÑƒÑ‚Ð°Ð½ + Ð±Ð°Ð¹Ñ…Ð³Ò¯Ð¹ Ñ…Ð¸Ñ‡ÑÑÐ»",
+      "item": [
+        {
+          "name": "Setup - Ð˜Ð´ÑÐ²Ñ…Ð³Ò¯Ð¹ Ð¾ÑŽÑƒÑ‚Ð°Ð½ S1002 Ð±Ð°Ñ‚Ð°Ð»Ð³Ð°Ð°Ð¶ÑƒÑƒÐ»Ð°Ñ…",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"inactive\",\"coursesTaken\":[]}" },
+            "url": "{{baseUrl}}/students/S1002"
+          }
+        },
+        {
+          "name": "Test - Ð˜Ð´ÑÐ²Ñ…Ð³Ò¯Ð¹ Ð¾ÑŽÑƒÑ‚Ð°Ð½ Ð±Ð° Ð±Ð°Ð¹Ñ…Ð³Ò¯Ð¹ Ñ…Ð¸Ñ‡ÑÑÐ»Ð¸Ð¹Ð½ Ð´Ð°Ð²Ñ…Ð°Ñ€ Ð°Ð»Ð´Ð°Ð°",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP ÑÑ‚Ð°Ñ‚ÑƒÑ 200 Ð±ÑƒÑ†Ð°Ð°Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('ÐžÑŽÑƒÑ‚Ð½Ñ‹ Ñ‚Ó©Ð»Ó©Ð² Ñ‚Ò¯Ñ€Ò¯Ò¯Ð»Ð¶ ÑˆÐ°Ð»Ð³Ð°Ð³Ð´Ð°Ð¶ ERROR_INACTIVE_STUDENT Ð±ÑƒÑ†Ð°Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('ERROR_INACTIVE_STUDENT');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S1002\",\"courseID\":\"NO_COURSE\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-07: Ð”Ð°Ð²Ñ…Ð°Ñ€ Ð°Ð»Ð´Ð°Ð° 2 - Ð‘Ð°Ð¹Ñ…Ð³Ò¯Ð¹ Ð¾ÑŽÑƒÑ‚Ð°Ð½ + Ð±Ð°Ð¹Ñ…Ð³Ò¯Ð¹ Ñ…Ð¸Ñ‡ÑÑÐ»",
+      "item": [
+        {
+          "name": "Test - Ð‘Ð°Ð¹Ñ…Ð³Ò¯Ð¹ Ð¾ÑŽÑƒÑ‚Ð°Ð½ Ð±Ð° Ð±Ð°Ð¹Ñ…Ð³Ò¯Ð¹ Ñ…Ð¸Ñ‡ÑÑÐ»Ð¸Ð¹Ð½ Ð´Ð°Ð²Ñ…Ð°Ñ€ Ð°Ð»Ð´Ð°Ð°",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP ÑÑ‚Ð°Ñ‚ÑƒÑ 200 Ð±ÑƒÑ†Ð°Ð°Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('ÐžÑŽÑƒÑ‚Ð°Ð½ Ñ‚Ò¯Ñ€Ò¯Ò¯Ð»Ð¶ ÑˆÐ°Ð»Ð³Ð°Ð³Ð´Ð°Ð¶ ERROR_NO_STUDENT Ð±ÑƒÑ†Ð°Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('ERROR_NO_STUDENT');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"NO_STUDENT\",\"courseID\":\"NO_COURSE\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-08: Ð¥ÑÐ·Ð³Ð°Ð°Ñ€ (Boundary) - Ð£Ñ€ÑŒÐ´Ð°Ñ‡ Ð½Ó©Ñ…Ñ†Ó©Ð»Ð³Ò¯Ð¹ Ñ…Ð¸Ñ‡ÑÑÐ»Ð´ Ñ…Ð¾Ð¾ÑÐ¾Ð½ Ñ‚Ò¯Ò¯Ñ…Ñ‚ÑÐ¹ Ð¾ÑŽÑƒÑ‚Ð°Ð½ Ð±Ò¯Ñ€Ñ‚Ð³Ò¯Ò¯Ð»ÑÑ…",
+      "item": [
+        {
+          "name": "Setup - Ð¨Ð¸Ð½Ñ Ð¾ÑŽÑƒÑ‚Ð°Ð½ S1004 (coursesTaken: []) Ò¯Ò¯ÑÐ³ÑÑ…",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"active\",\"coursesTaken\":[]}" },
+            "url": "{{baseUrl}}/students/S1004"
+          }
+        },
+        {
+          "name": "Setup - Ð£Ñ€ÑŒÐ´Ð°Ñ‡ Ð½Ó©Ñ…Ñ†Ó©Ð»Ð³Ò¯Ð¹ CS101 Ñ…Ð¸Ñ‡ÑÑÐ» Ò¯Ò¯ÑÐ³ÑÑ…",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"prerequisites\":[]}" },
+            "url": "{{baseUrl}}/courses/CS101"
+          }
+        },
+        {
+          "name": "Test - Ð¥Ð¾Ð¾ÑÐ¾Ð½ Ð¶Ð°Ð³ÑÐ°Ð°Ð»Ñ‚Ñ‚Ð°Ð¹ Ò¯ÐµÐ´ Ð°Ð¼Ð¶Ð¸Ð»Ñ‚Ñ‚Ð°Ð¹ Ð±Ò¯Ñ€Ñ‚Ð³Ò¯Ò¯Ð»ÑÑ… (201 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP ÑÑ‚Ð°Ñ‚ÑƒÑ 201 Ð±ÑƒÑ†Ð°Ð°Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Ð¥Ð°Ñ€Ð¸Ñƒ result Ð½ÑŒ OK Ð±Ð°Ð¹Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('OK');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S1004\",\"courseID\":\"CS101\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-09: Ð¥ÑÐ·Ð³Ð°Ð°Ñ€ - Ð¨Ð°Ð°Ñ€Ð´Ð»Ð°Ð³Ð°Ñ‚Ð°Ð¹ Ñ‚Ð°Ð»Ð±Ð°Ñ€ Ð´ÑƒÑ‚ÑƒÑƒ Ò¯ÐµÐ´ 400 ERROR_BAD_REQUEST",
+      "item": [
+        {
+          "name": "Test - courseID Ñ‚Ð°Ð»Ð±Ð°Ñ€ Ð´ÑƒÑ‚ÑƒÑƒ Ñ…Ò¯ÑÑÐ»Ñ‚ Ð¸Ð»Ð³ÑÑÑ…",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP ÑÑ‚Ð°Ñ‚ÑƒÑ 400 Ð±ÑƒÑ†Ð°Ð°Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Ð¥Ð°Ñ€Ð¸Ñƒ result Ð½ÑŒ ERROR_BAD_REQUEST Ð±Ð°Ð¹Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('ERROR_BAD_REQUEST');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"S1001\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-10: Ð¥ÑÐ·Ð³Ð°Ð°Ñ€ - Ð‘ÑƒÑ€ÑƒÑƒ JSON Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚ Ð¸Ð»Ð³ÑÑÑ…ÑÐ´ 400 ERROR_BAD_JSON",
+      "item": [
+        {
+          "name": "Test - Ð­Ð²Ð´ÑÑ€ÑÑÐ½ JSON ÑÐ¸Ð½Ñ‚Ð°ÐºÑ Ð¸Ð»Ð³ÑÑÑ…",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP ÑÑ‚Ð°Ñ‚ÑƒÑ 400 Ð±ÑƒÑ†Ð°Ð°Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Ð¥Ð°Ñ€Ð¸Ñƒ result Ð½ÑŒ ERROR_BAD_JSON Ð±Ð°Ð¹Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.expect(pm.response.json().result).to.eql('ERROR_BAD_JSON');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\": \"S1001\", broken_json" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-11: Ð”Ð°Ð°Ð»Ð³Ð°Ð²Ð°Ñ€ 5 - ÐÐ¸Ð¹Ñ‚Ð¸Ð¹Ð½ API (JSONPlaceholder Users)",
+      "item": [
+        {
+          "name": "Test - GET /users (ÑÑ‚Ð°Ñ‚ÑƒÑ 200, Ð¼Ð°ÑÑÐ¸Ð², ÑÑ…Ð½Ð¸Ð¹ Ñ…ÑÑ€ÑÐ³Ð»ÑÐ³Ñ‡)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP ÑÑ‚Ð°Ñ‚ÑƒÑ 200 Ð±ÑƒÑ†Ð°Ð°Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Ð¥Ð°Ñ€Ð¸Ñƒ Ð½ÑŒ Ñ…Ð¾Ð¾ÑÐ¾Ð½ Ð±Ð¸Ñˆ Ð¼Ð°ÑÑÐ¸Ð² Ð±Ð°Ð¹Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    const users = pm.response.json();",
+                  "    pm.expect(users).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "pm.test('Ð­Ñ…Ð½Ð¸Ð¹ Ñ…ÑÑ€ÑÐ³Ð»ÑÐ³Ñ‡Ð¸Ð¹Ð½ Ð½ÑÑ€ Leanne Graham Ð±Ð°Ð¹Ñ… Ñ‘ÑÑ‚Ð¾Ð¹', function () {",
+                  "    const users = pm.response.json();",
+                  "    pm.expect(users[0].name).to.eql('Leanne Graham');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "https://jsonplaceholder.typicode.com/users"
+          }
+        }
+      ]
+    }
+  ]
+}
+
