@@ -1,0 +1,53 @@
+newman
+
+Lab 05 - AI Extra Combination Tests
+
+Folder AI-01: Happy path хослол
+Sub-folder Setup student AI1
+  PUT http://localhost:3000/students/AI1 [200 OK, 178B, 45ms]
+
+Sub-folder Setup course AI_C1
+  PUT http://localhost:3000/courses/AI_C1 [200 OK, 178B, 3ms]
+
+Sub-folder POST /registrations (201 OK)
+  POST http://localhost:3000/registrations [201 Created, 203B, 4ms]
+  Pass  Status 201
+  Pass  Result OK and numeric registrationID
+
+Folder AI-02: Урьдач нөхцөл дутуу хослол
+Sub-folder Setup student AI2
+  PUT http://localhost:3000/students/AI2 [200 OK, 178B, 3ms]
+
+Sub-folder Setup course AI_C2
+  PUT http://localhost:3000/courses/AI_C2 [200 OK, 178B, 3ms]
+
+Sub-folder POST /registrations (ERROR_PREREQUISITES)
+  POST http://localhost:3000/registrations [200 OK, 215B, 5ms]
+  Pass  Status 200
+  Pass  ERROR_PREREQUISITES with missing array
+
+Folder AI-03: Буруу JSON хослол
+Sub-folder POST /registrations (400 ERROR_BAD_JSON)
+  POST http://localhost:3000/registrations [400 Bad Request, 199B, 3ms]
+  Pass  Status 400
+  Pass  ERROR_BAD_JSON
+
+----------------------------------------------------------------
+|                         |         executed |          failed |
+--------------------------+------------------+------------------
+|              iterations |                1 |               0 |
+--------------------------+------------------+------------------
+|                requests |                7 |               0 |
+--------------------------+------------------+------------------
+|            test-scripts |                3 |               0 |
+--------------------------+------------------+------------------
+|      prerequest-scripts |                0 |               0 |
+--------------------------+------------------+------------------
+|              assertions |                6 |               0 |
+----------------------------------------------------------------
+| total run duration: 668ms                                    |
+----------------------------------------------------------------
+| total data received: 174B (approx)                           |
+----------------------------------------------------------------
+| average response time: 9ms [min: 3ms, max: 45ms, s.d.: 14ms] |
+----------------------------------------------------------------

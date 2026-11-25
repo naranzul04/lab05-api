@@ -1,0 +1,127 @@
+﻿{
+  "info": {
+    "name": "Lab 05 - AI Extra Combination Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" }
+  ],
+  "item": [
+    {
+      "name": "AI-01: Happy path хослол",
+      "item": [
+        {
+          "name": "Setup student AI1",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"active\",\"coursesTaken\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/students/AI1"
+          }
+        },
+        {
+          "name": "Setup course AI_C1",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"prerequisites\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/courses/AI_C1"
+          }
+        },
+        {
+          "name": "POST /registrations (201 OK)",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                "pm.test('Result OK and numeric registrationID', () => {",
+                "  const d = pm.response.json();",
+                "  pm.expect(d.result).to.eql('OK');",
+                "  pm.expect(d.registrationID).to.be.a('number');",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"AI1\",\"courseID\":\"AI_C1\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI-02: Урьдач нөхцөл дутуу хослол",
+      "item": [
+        {
+          "name": "Setup student AI2",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\":\"active\",\"coursesTaken\":[]}" },
+            "url": "{{baseUrl}}/students/AI2"
+          }
+        },
+        {
+          "name": "Setup course AI_C2",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"prerequisites\":[\"CS102\"]}" },
+            "url": "{{baseUrl}}/courses/AI_C2"
+          }
+        },
+        {
+          "name": "POST /registrations (ERROR_PREREQUISITES)",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "pm.test('ERROR_PREREQUISITES with missing array', () => {",
+                "  const d = pm.response.json();",
+                "  pm.expect(d.result).to.eql('ERROR_PREREQUISITES');",
+                "  pm.expect(d.missing).to.eql(['CS102']);",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"AI2\",\"courseID\":\"AI_C2\"}" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI-03: Буруу JSON хослол",
+      "item": [
+        {
+          "name": "POST /registrations (400 ERROR_BAD_JSON)",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                "pm.test('ERROR_BAD_JSON', () => pm.expect(pm.response.json().result).to.eql('ERROR_BAD_JSON'));"
+              ],
+              "type": "text/javascript"
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"studentID\":\"AI1\", bad" },
+            "url": "{{baseUrl}}/registrations"
+          }
+        }
+      ]
+    }
+  ]
+}
